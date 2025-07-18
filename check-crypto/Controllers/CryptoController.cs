@@ -9,7 +9,7 @@ using check_crypto.Models;
 namespace check_crypto.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/crypto")]
     public class CryptoController : ControllerBase
     {
         private readonly IBinanceService _binanceService;
@@ -68,12 +68,12 @@ namespace check_crypto.Controllers
                     });
                 }
 
-                return NotFound(new { message = $"Dados não encontrados para {symbol}" });
+                return NotFound(new { message = $"Data not found for {symbol}" });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting crypto price for {Symbol}", symbol);
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
@@ -84,7 +84,7 @@ namespace check_crypto.Controllers
             {
                 if (symbols == null || symbols.Length == 0)
                 {
-                    return BadRequest(new { message = "Pelo menos um símbolo deve ser fornecido" });
+                    return BadRequest(new { message = "At least one symbol must be provided" });
                 }
 
                 var tasks = symbols.Select(async symbol =>
@@ -115,7 +115,7 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting multiple crypto prices");
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
@@ -126,9 +126,9 @@ namespace check_crypto.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return Unauthorized(new { message = "Token inválido" });
+                    return Unauthorized(new { message = "Invalid token" });
                 }
 
                 var cryptoData = await _binanceService.GetCryptoPriceAsync(request.Symbol) ??
@@ -136,7 +136,7 @@ namespace check_crypto.Controllers
 
                 if (cryptoData == null)
                 {
-                    return NotFound(new { message = $"Dados não encontrados para {request.Symbol}" });
+                    return NotFound(new { message = $"Data not found for {request.Symbol}" });
                 }
 
                 var history = new CryptoHistory
@@ -165,7 +165,7 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error saving crypto history");
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
@@ -176,9 +176,9 @@ namespace check_crypto.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return Unauthorized(new { message = "Token inválido" });
+                    return Unauthorized(new { message = "Invalid token" });
                 }
 
                 var query = _context.CryptoHistories
@@ -214,7 +214,7 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting crypto history");
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 

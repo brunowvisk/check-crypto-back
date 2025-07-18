@@ -14,7 +14,7 @@ namespace check_crypto.Services
     {
         Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
         Task<AuthResponseDto?> RegisterAsync(RegisterDto registerDto);
-        Task<UserDto?> GetUserByIdAsync(int userId);
+        Task<UserDto?> GetUserByIdAsync(Guid userId);
         string GenerateJwtToken(User user);
     }
 
@@ -87,7 +87,7 @@ namespace check_crypto.Services
             };
         }
 
-        public async Task<UserDto?> GetUserByIdAsync(int userId)
+        public async Task<UserDto?> GetUserByIdAsync(Guid userId)
         {
             var user = await _context.Users.FindAsync(userId);
             

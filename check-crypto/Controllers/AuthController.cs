@@ -5,7 +5,7 @@ using check_crypto.DTOs;
 namespace check_crypto.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -26,7 +26,7 @@ namespace check_crypto.Controllers
                 
                 if (result == null)
                 {
-                    return BadRequest(new { message = "Email já está em uso" });
+                    return BadRequest(new { message = "Email is already in use" });
                 }
 
                 return Ok(result);
@@ -34,7 +34,7 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during user registration");
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
@@ -47,7 +47,7 @@ namespace check_crypto.Controllers
                 
                 if (result == null)
                 {
-                    return Unauthorized(new { message = "Email ou senha inválidos" });
+                    return Unauthorized(new { message = "Invalid email or password" });
                 }
 
                 return Ok(result);
@@ -55,7 +55,7 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during user login");
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
@@ -67,16 +67,16 @@ namespace check_crypto.Controllers
             {
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
                 
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return Unauthorized(new { message = "Token inválido" });
+                    return Unauthorized(new { message = "Invalid token" });
                 }
 
                 var user = await _authService.GetUserByIdAsync(userId);
                 
                 if (user == null)
                 {
-                    return NotFound(new { message = "Usuário não encontrado" });
+                    return NotFound(new { message = "User not found" });
                 }
 
                 return Ok(user);
@@ -84,7 +84,7 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting current user");
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
     }

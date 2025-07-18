@@ -16,7 +16,7 @@ namespace check_crypto.DTOs
 
     public class CryptoHistoryDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string CryptoSymbol { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public decimal Volume { get; set; }

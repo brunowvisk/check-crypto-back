@@ -5,10 +5,10 @@ namespace check_crypto.Models
 {
     public class CryptoHistory
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         
         [Required]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         
         [Required]
         [StringLength(10)]

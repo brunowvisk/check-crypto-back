@@ -39,7 +39,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "http://localhost:8080")
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "http://localhost:8080", "http://localhost:5000",
+                           "https://localhost:3000", "https://localhost:5173", "https://localhost:8080", "https://localhost:5000")
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -60,12 +61,12 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Check Crypto API",
         Version = "v1",
-        Description = "API para monitoramento de criptomoedas com alertas em tempo real"
+        Description = "API for cryptocurrency monitoring with real-time alerts"
     });
     
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header usando o esquema Bearer. \r\n\r\n Entre 'Bearer' [espaço] e então seu token na entrada de texto abaixo.\r\n\r\nExemplo: \"Bearer 12345abcdef\"",
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,

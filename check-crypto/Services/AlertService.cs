@@ -7,11 +7,11 @@ namespace check_crypto.Services
 {
     public interface IAlertService
     {
-        Task<AlertDto?> CreateAlertAsync(int userId, CreateAlertDto createAlertDto);
-        Task<AlertDto?> UpdateAlertAsync(int userId, int alertId, UpdateAlertDto updateAlertDto);
-        Task<bool> DeleteAlertAsync(int userId, int alertId);
-        Task<List<AlertDto>> GetUserAlertsAsync(int userId);
-        Task<List<AlertHistoryDto>> GetTriggeredAlertsAsync(int userId);
+        Task<AlertDto?> CreateAlertAsync(Guid userId, CreateAlertDto createAlertDto);
+        Task<AlertDto?> UpdateAlertAsync(Guid userId, Guid alertId, UpdateAlertDto updateAlertDto);
+        Task<bool> DeleteAlertAsync(Guid userId, Guid alertId);
+        Task<List<AlertDto>> GetUserAlertsAsync(Guid userId);
+        Task<List<AlertHistoryDto>> GetTriggeredAlertsAsync(Guid userId);
         Task CheckAndTriggerAlertsAsync(CryptoData cryptoData);
     }
 
@@ -26,7 +26,7 @@ namespace check_crypto.Services
             _logger = logger;
         }
 
-        public async Task<AlertDto?> CreateAlertAsync(int userId, CreateAlertDto createAlertDto)
+        public async Task<AlertDto?> CreateAlertAsync(Guid userId, CreateAlertDto createAlertDto)
         {
             if (createAlertDto.MinPrice >= createAlertDto.MaxPrice)
             {
@@ -60,7 +60,7 @@ namespace check_crypto.Services
             };
         }
 
-        public async Task<AlertDto?> UpdateAlertAsync(int userId, int alertId, UpdateAlertDto updateAlertDto)
+        public async Task<AlertDto?> UpdateAlertAsync(Guid userId, Guid alertId, UpdateAlertDto updateAlertDto)
         {
             var alert = await _context.Alerts
                 .FirstOrDefaultAsync(a => a.Id == alertId && a.UserId == userId);
@@ -106,7 +106,7 @@ namespace check_crypto.Services
             };
         }
 
-        public async Task<bool> DeleteAlertAsync(int userId, int alertId)
+        public async Task<bool> DeleteAlertAsync(Guid userId, Guid alertId)
         {
             var alert = await _context.Alerts
                 .FirstOrDefaultAsync(a => a.Id == alertId && a.UserId == userId);
@@ -122,7 +122,7 @@ namespace check_crypto.Services
             return true;
         }
 
-        public async Task<List<AlertDto>> GetUserAlertsAsync(int userId)
+        public async Task<List<AlertDto>> GetUserAlertsAsync(Guid userId)
         {
             var alerts = await _context.Alerts
                 .Where(a => a.UserId == userId)
@@ -143,7 +143,7 @@ namespace check_crypto.Services
             }).ToList();
         }
 
-        public async Task<List<AlertHistoryDto>> GetTriggeredAlertsAsync(int userId)
+        public async Task<List<AlertHistoryDto>> GetTriggeredAlertsAsync(Guid userId)
         {
             var alerts = await _context.Alerts
                 .Where(a => a.UserId == userId && a.TriggeredAt.HasValue)

@@ -30,7 +30,7 @@ namespace check_crypto.DTOs
 
     public class AlertDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string CryptoSymbol { get; set; } = string.Empty;
         public decimal MinPrice { get; set; }
         public decimal MaxPrice { get; set; }
@@ -43,7 +43,7 @@ namespace check_crypto.DTOs
 
     public class AlertHistoryDto
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string CryptoSymbol { get; set; } = string.Empty;
         public decimal MinPrice { get; set; }
         public decimal MaxPrice { get; set; }

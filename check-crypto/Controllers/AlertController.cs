@@ -6,7 +6,7 @@ using check_crypto.DTOs;
 namespace check_crypto.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/alerts")]
     [Authorize]
     public class AlertController : ControllerBase
     {
@@ -25,16 +25,16 @@ namespace check_crypto.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return Unauthorized(new { message = "Token inválido" });
+                    return Unauthorized(new { message = "Invalid token" });
                 }
 
                 var alert = await _alertService.CreateAlertAsync(userId, createAlertDto);
                 
                 if (alert == null)
                 {
-                    return BadRequest(new { message = "Preço mínimo deve ser menor que o preço máximo" });
+                    return BadRequest(new { message = "Minimum price must be lower than maximum price" });
                 }
 
                 return CreatedAtAction(nameof(GetAlert), new { id = alert.Id }, alert);
@@ -42,19 +42,19 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating alert");
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetAlert(int id)
+        public async Task<IActionResult> GetAlert(Guid id)
         {
             try
             {
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return Unauthorized(new { message = "Token inválido" });
+                    return Unauthorized(new { message = "Invalid token" });
                 }
 
                 var alerts = await _alertService.GetUserAlertsAsync(userId);
@@ -62,7 +62,7 @@ namespace check_crypto.Controllers
 
                 if (alert == null)
                 {
-                    return NotFound(new { message = "Alerta não encontrado" });
+                    return NotFound(new { message = "Alert not found" });
                 }
 
                 return Ok(alert);
@@ -70,7 +70,7 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting alert {AlertId}", id);
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
@@ -80,9 +80,9 @@ namespace check_crypto.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return Unauthorized(new { message = "Token inválido" });
+                    return Unauthorized(new { message = "Invalid token" });
                 }
 
                 var alerts = await _alertService.GetUserAlertsAsync(userId);
@@ -91,7 +91,7 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting user alerts");
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
@@ -101,9 +101,9 @@ namespace check_crypto.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return Unauthorized(new { message = "Token inválido" });
+                    return Unauthorized(new { message = "Invalid token" });
                 }
 
                 var alerts = await _alertService.GetTriggeredAlertsAsync(userId);
@@ -112,26 +112,26 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting triggered alerts");
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAlert(int id, [FromBody] UpdateAlertDto updateAlertDto)
+        public async Task<IActionResult> UpdateAlert(Guid id, [FromBody] UpdateAlertDto updateAlertDto)
         {
             try
             {
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return Unauthorized(new { message = "Token inválido" });
+                    return Unauthorized(new { message = "Invalid token" });
                 }
 
                 var alert = await _alertService.UpdateAlertAsync(userId, id, updateAlertDto);
                 
                 if (alert == null)
                 {
-                    return BadRequest(new { message = "Alerta não encontrado ou preço mínimo deve ser menor que o preço máximo" });
+                    return BadRequest(new { message = "Alert not found or minimum price must be lower than maximum price" });
                 }
 
                 return Ok(alert);
@@ -139,26 +139,26 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating alert {AlertId}", id);
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAlert(int id)
+        public async Task<IActionResult> DeleteAlert(Guid id)
         {
             try
             {
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
                 {
-                    return Unauthorized(new { message = "Token inválido" });
+                    return Unauthorized(new { message = "Invalid token" });
                 }
 
                 var success = await _alertService.DeleteAlertAsync(userId, id);
                 
                 if (!success)
                 {
-                    return NotFound(new { message = "Alerta não encontrado" });
+                    return NotFound(new { message = "Alert not found" });
                 }
 
                 return NoContent();
@@ -166,7 +166,7 @@ namespace check_crypto.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting alert {AlertId}", id);
-                return StatusCode(500, new { message = "Erro interno do servidor" });
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
     }

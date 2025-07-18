@@ -20,6 +20,7 @@ namespace check_crypto.Data
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
                 entity.HasIndex(e => e.Email).IsUnique();
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -28,6 +29,7 @@ namespace check_crypto.Data
             modelBuilder.Entity<Alert>(entity =>
             {
                 entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Alerts)
                     .HasForeignKey(d => d.UserId)
@@ -38,6 +40,7 @@ namespace check_crypto.Data
             modelBuilder.Entity<CryptoHistory>(entity =>
             {
                 entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.CryptoHistories)
                     .HasForeignKey(d => d.UserId)
