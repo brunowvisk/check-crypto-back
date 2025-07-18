@@ -230,5 +230,64 @@ namespace check_crypto.Controllers
 
             return Ok(new { symbols });
         }
+
+        [HttpGet("chart/{symbol}")]
+        public async Task<IActionResult> GetChartData(string symbol, int limit = 100)
+        {
+            try
+            {
+                // Get current price data
+                var currentData = await _binanceService.GetCryptoPriceAsync(symbol);
+                if (currentData == null)
+                {
+                    return NotFound(new { message = $"Data not found for {symbol}" });
+                }
+
+                // Get historical data points (last 'limit' records)
+                var historyData = await _context.CryptoHistories
+                    .Where(h => h.CryptoSymbol == symbol.ToUpper())
+                    .OrderByDescending(h => h.Timestamp)
+                    .Take(limit)
+                    .OrderBy(h => h.Timestamp)
+                    .ToListAsync();
+
+                var dataPoints = historyData.Select(h => new ChartDataPointDto
+                {
+                    Timestamp = h.Timestamp,
+                    Price = h.Price,
+                    Volume = h.Volume
+                }).ToList();
+
+                // If no historical data, create a single point with current data
+                if (!dataPoints.Any())
+                {
+                    dataPoints.Add(new ChartDataPointDto
+                    {
+                        Timestamp = DateTime.UtcNow,
+                        Price = currentData.Price,
+                        Volume = currentData.Volume
+                    });
+                }
+
+                var chartData = new CryptoChartDto
+                {
+                    Symbol = symbol.ToUpper(),
+                    DataPoints = dataPoints,
+                    CurrentPrice = currentData.Price,
+                    Change24h = currentData.Change24h,
+                    High24h = currentData.High24h,
+                    Low24h = currentData.Low24h,
+                    Volume24h = currentData.Volume,
+                    LastUpdated = DateTime.UtcNow
+                };
+
+                return Ok(chartData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting chart data for {Symbol}", symbol);
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
     }
 }

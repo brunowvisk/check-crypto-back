@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using check_crypto.Data;
 using check_crypto.Services;
+using check_crypto.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,12 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddHttpClient<IBinanceService, BinanceService>();
 builder.Services.AddHttpClient<ICoinGeckoService, CoinGeckoService>();
+
+// Add SignalR
+builder.Services.AddSignalR();
+
+// Add Background Service
+builder.Services.AddHostedService<CryptoUpdateService>();
 
 // Configure Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -110,5 +117,8 @@ app.UseCors("AllowVueApp");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+// Map SignalR Hub
+app.MapHub<CryptoHub>("/cryptohub");
 
 app.Run();
