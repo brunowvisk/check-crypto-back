@@ -28,20 +28,18 @@ namespace check_crypto.Services
                 { "ADA", "cardano" },
                 { "DOT", "polkadot" },
                 { "XRP", "ripple" },
-                { "LTC", "litecoin" },
                 { "LINK", "chainlink" },
-                { "BCH", "bitcoin-cash" },
                 { "XLM", "stellar" },
                 { "USDT", "tether" },
                 { "USDC", "usd-coin" },
                 { "DOGE", "dogecoin" },
-                { "UNI", "uniswap" },
-                { "WBTC", "wrapped-bitcoin" },
-                { "THETA", "theta-token" },
                 { "SOL", "solana" },
-                { "VET", "vechain" },
-                { "FIL", "filecoin" },
-                { "TRX", "tron" }
+                { "AVAX", "avalanche-2" },
+                { "MATIC", "matic-network" },
+                { "SAND", "the-sandbox" },
+                { "AAVE", "aave" },
+                { "PAXG", "pax-gold" },
+                { "IMX", "immutable-x" }
             };
         }
 

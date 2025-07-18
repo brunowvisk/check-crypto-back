@@ -223,9 +223,9 @@ namespace check_crypto.Controllers
         {
             var symbols = new[]
             {
-                "BTC", "ETH", "BNB", "ADA", "DOT", "XRP", "LTC", "LINK",
-                "BCH", "XLM", "USDT", "USDC", "DOGE", "UNI", "WBTC",
-                "THETA", "SOL", "VET", "FIL", "TRX"
+                "BTC", "ETH", "BNB", "ADA", "DOT", "XRP", "LINK",
+                "XLM", "USDT", "USDC", "DOGE", "SOL", "AVAX", "MATIC",
+                "SAND", "AAVE", "PAXG", "IMX"
             };
 
             return Ok(new { symbols });

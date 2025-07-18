@@ -132,3 +132,4 @@
 /home/brunowvisk/projetos/dotnet/check-crypto-back/check-crypto/obj/Debug/net9.0/check-crypto.pdb
 /home/brunowvisk/projetos/dotnet/check-crypto-back/check-crypto/obj/Debug/net9.0/check-crypto.genruntimeconfig.cache
 /home/brunowvisk/projetos/dotnet/check-crypto-back/check-crypto/obj/Debug/net9.0/ref/check-crypto.dll
+/home/brunowvisk/projetos/dotnet/check-crypto-back/check-crypto/obj/Debug/net9.0/check-crypto.sourcelink.json
