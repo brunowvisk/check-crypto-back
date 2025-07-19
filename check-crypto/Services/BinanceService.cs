@@ -32,7 +32,11 @@ namespace check_crypto.Services
         {
             try
             {
-                var response = await _httpClient.GetStringAsync($"https://api.binance.com/api/v3/ticker/24hr?symbol={symbol.ToUpper()}USDT");
+                var httpResponse = await _httpClient.GetAsync($"https://api.binance.com/api/v3/ticker/24hr?symbol={symbol.ToUpper()}USDT");
+                
+                LogRateLimitHeaders(httpResponse.Headers, "ticker/24hr");
+                
+                var response = await httpResponse.Content.ReadAsStringAsync();
                 var binanceData = JsonConvert.DeserializeObject<BinanceTickerResponse>(response);
 
                 if (binanceData == null) return null;
@@ -75,9 +79,12 @@ namespace check_crypto.Services
                 var limit = Math.Ceiling((double)hours / GetIntervalHours(interval));
                 var actualLimit = Math.Min((int)limit, 1000);
 
-                var response = await _httpClient.GetStringAsync(
+                var httpResponse = await _httpClient.GetAsync(
                     $"https://api.binance.com/api/v3/klines?symbol={symbol.ToUpper()}USDT&interval={interval}&limit={actualLimit}");
 
+                LogRateLimitHeaders(httpResponse.Headers, "klines");
+
+                var response = await httpResponse.Content.ReadAsStringAsync();
                 var klines = JsonConvert.DeserializeObject<decimal[][]>(response);
                 
                 if (klines == null) return new List<CryptoCandleDto>();
@@ -112,6 +119,32 @@ namespace check_crypto.Services
                 "1d" => 24.0,
                 _ => 1.0
             };
+        }
+
+        private void LogRateLimitHeaders(System.Net.Http.Headers.HttpResponseHeaders headers, string endpoint)
+        {
+            var rateLimitInfo = new List<string>();
+
+            if (headers.TryGetValues("x-mbx-used-weight", out var usedWeight))
+                rateLimitInfo.Add($"Used Weight: {string.Join(",", usedWeight)}");
+
+            if (headers.TryGetValues("x-mbx-used-weight-1m", out var usedWeight1m))
+                rateLimitInfo.Add($"Used Weight 1m: {string.Join(",", usedWeight1m)}");
+
+            if (headers.TryGetValues("x-mbx-order-count-10s", out var orderCount10s))
+                rateLimitInfo.Add($"Order Count 10s: {string.Join(",", orderCount10s)}");
+
+            if (headers.TryGetValues("x-mbx-order-count-1d", out var orderCount1d))
+                rateLimitInfo.Add($"Order Count 1d: {string.Join(",", orderCount1d)}");
+
+            if (headers.TryGetValues("retry-after", out var retryAfter))
+                rateLimitInfo.Add($"Retry After: {string.Join(",", retryAfter)}");
+
+            if (rateLimitInfo.Any())
+            {
+                _logger.LogInformation("Binance API Rate Limits for {Endpoint}: {RateLimits}", 
+                    endpoint, string.Join(" | ", rateLimitInfo));
+            }
         }
 
         public async Task StartWebSocketAsync(string symbol, CancellationToken cancellationToken)

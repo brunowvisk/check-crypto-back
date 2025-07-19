@@ -6,6 +6,7 @@ using System.Text;
 using check_crypto.Data;
 using check_crypto.Services;
 using check_crypto.Hubs;
+using check_crypto.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -113,6 +114,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseCors("AllowVueApp");
 app.UseAuthentication();
 app.UseAuthorization();
