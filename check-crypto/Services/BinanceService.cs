@@ -2,12 +2,14 @@ using System.Net.WebSockets;
 using System.Text;
 using Newtonsoft.Json;
 using check_crypto.Models;
+using check_crypto.DTOs;
 
 namespace check_crypto.Services
 {
     public interface IBinanceService
     {
         Task<CryptoData?> GetCryptoPriceAsync(string symbol);
+        Task<List<CryptoCandleDto>> GetHistoricalDataAsync(string symbol, string timeframe = "1h", int hours = 24);
         Task StartWebSocketAsync(string symbol, CancellationToken cancellationToken);
         event Action<CryptoData>? OnPriceUpdate;
     }
@@ -52,6 +54,64 @@ namespace check_crypto.Services
                 _logger.LogError(ex, "Error fetching crypto price from Binance for symbol: {Symbol}", symbol);
                 return null;
             }
+        }
+
+        public async Task<List<CryptoCandleDto>> GetHistoricalDataAsync(string symbol, string timeframe = "1h", int hours = 24)
+        {
+            try
+            {
+                var binanceIntervals = new Dictionary<string, string>
+                {
+                    { "1m", "1m" },
+                    { "5m", "5m" },
+                    { "15m", "15m" },
+                    { "30m", "30m" },
+                    { "1h", "1h" },
+                    { "4h", "4h" },
+                    { "1d", "1d" }
+                };
+
+                var interval = binanceIntervals.ContainsKey(timeframe) ? binanceIntervals[timeframe] : "1h";
+                var limit = Math.Ceiling((double)hours / GetIntervalHours(interval));
+                var actualLimit = Math.Min((int)limit, 1000);
+
+                var response = await _httpClient.GetStringAsync(
+                    $"https://api.binance.com/api/v3/klines?symbol={symbol.ToUpper()}USDT&interval={interval}&limit={actualLimit}");
+
+                var klines = JsonConvert.DeserializeObject<decimal[][]>(response);
+                
+                if (klines == null) return new List<CryptoCandleDto>();
+
+                return klines.Select(kline => new CryptoCandleDto
+                {
+                    Timestamp = (long)kline[0],
+                    Open = kline[1],
+                    High = kline[2],
+                    Low = kline[3],
+                    Close = kline[4],
+                    Volume = kline[5]
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching historical data from Binance for symbol: {Symbol}", symbol);
+                return new List<CryptoCandleDto>();
+            }
+        }
+
+        private double GetIntervalHours(string interval)
+        {
+            return interval switch
+            {
+                "1m" => 1.0 / 60,
+                "5m" => 5.0 / 60,
+                "15m" => 15.0 / 60,
+                "30m" => 30.0 / 60,
+                "1h" => 1.0,
+                "4h" => 4.0,
+                "1d" => 24.0,
+                _ => 1.0
+            };
         }
 
         public async Task StartWebSocketAsync(string symbol, CancellationToken cancellationToken)

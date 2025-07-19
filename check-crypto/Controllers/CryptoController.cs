@@ -231,6 +231,27 @@ namespace check_crypto.Controllers
             return Ok(new { symbols });
         }
 
+        [HttpGet("historical/{symbol}")]
+        public async Task<IActionResult> GetHistoricalData(string symbol, [FromQuery] string timeframe = "1h", [FromQuery] int hours = 24)
+        {
+            try
+            {
+                var historicalData = await _binanceService.GetHistoricalDataAsync(symbol, timeframe, hours);
+                
+                if (!historicalData.Any())
+                {
+                    return NotFound(new { message = $"Historical data not found for {symbol}" });
+                }
+
+                return Ok(historicalData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting historical data for {Symbol}", symbol);
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+
         [HttpGet("chart/{symbol}")]
         public async Task<IActionResult> GetChartData(string symbol, int limit = 100)
         {

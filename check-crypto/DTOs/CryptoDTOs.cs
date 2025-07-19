@@ -69,4 +69,20 @@ namespace check_crypto.DTOs
         public decimal Low24h { get; set; }
         public DateTime Timestamp { get; set; }
     }
+
+    public class CryptoCandleDto
+    {
+        public long Timestamp { get; set; }
+        public decimal Open { get; set; }
+        public decimal High { get; set; }
+        public decimal Low { get; set; }
+        public decimal Close { get; set; }
+        public decimal Volume { get; set; }
+    }
+
+    public class HistoricalDataRequestDto
+    {
+        public string Timeframe { get; set; } = "1h";
+        public int Hours { get; set; } = 24;
+    }
 }
